@@ -1,0 +1,1 @@
+# qring_document
