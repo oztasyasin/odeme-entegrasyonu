@@ -261,7 +261,7 @@ Goole ile yapılan ödemelerden sonra gelen örnek purchase datası şu şekilde
 }
 ```
 
-buradaki  transactionId, purchaseToken bilgileri mutlaka apiye gönderilmelidir. 
+buradaki  transactionId, purchaseToken bilgileri mutlaka apiye gönderilmelidir. Currency bilgisi ios ve android için bu kısımda gelmez. Server sideda alınması gerek.
 Api tarafında bu ödemenin kontrolünü yapabilmek için [Google Cloud Console](https://console.cloud.google.com)'a giderek appinize bağlamak üzere bir proje oluşturun.
 
 Google Play Android Developer API etkinleştirdikten sonra
