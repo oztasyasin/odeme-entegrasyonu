@@ -320,7 +320,7 @@ def get_access_token():
 
 def verify_purchase(access_token):
     """Google Play API'ye istek atarak satın almayı doğrular"""
-    url = f"https://androidpublisher.googleapis.com/androidpublisher/v3/applications/{PACKAGE_NAME}/purchases/subscriptions/{PRODUCT_ID}/tokens/{PURCHASE_TOKEN}"
+    url = f"https://androidpublisher.googleapis.com/androidpublisher/v3/applications/{PACKAGE_NAME}/purchases/subscriptionsv2/tokens/{PURCHASE_TOKEN}"
     
     headers = {"Authorization": f"Bearer {access_token}"}
     
@@ -341,18 +341,34 @@ Gelen başarılı response datası aşağıdaki gibidir
 
 ```json
 {
-    "startTimeMillis": "1742985723596",
-    "expiryTimeMillis": "1742998325049",
-    "autoRenewing": false,
-    "priceCurrencyCode": "TRY",
-    "priceAmountMicros": "199990000",
-    "countryCode": "TR",
-    "developerPayload": "",
-    "cancelReason": 1,
-    "orderId": "GPA.3385-3910-4138-23422..5",
-    "purchaseType": 0,
-    "acknowledgementState": 1,
-    "kind": "androidpublisher#subscriptionPurchase"
+    "kind": "androidpublisher#subscriptionPurchaseV2",
+    "startTime": "2025-04-16T12:03:53.154Z",
+    "regionCode": "TR",
+    "subscriptionState": "SUBSCRIPTION_STATE_ACTIVE",
+    "latestOrderId": "GPA.3381-1200-4946-13023",
+    "linkedPurchaseToken": "iinpfcbcncdbagjjnienfjao.AO-J1OzF625TmmkZZrTEdiha5v18yJJnyYcpppnpungwI9Ii-xrnDPLgN_8HKfqjl9pU19_TFaPLIuaIiQRujXRakZFMMfl0jqW7u0SvOJgPE9yd1L_6FUo",
+    "testPurchase": {},
+    "acknowledgementState": "ACKNOWLEDGEMENT_STATE_ACKNOWLEDGED",
+    "lineItems": [
+        {
+            "productId": "qring_subs",
+            "expiryTime": "2025-04-16T12:53:22.217Z",
+            "autoRenewingPlan": {
+                "autoRenewEnabled": true,
+                "recurringPrice": {
+                    "currencyCode": "TRY",
+                    "units": "299",
+                    "nanos": 990000000
+                }
+            },
+            "offerDetails": {
+                "basePlanId": "qring-gold",
+                "offerTags": [
+                    "qringgold"
+                ]
+            }
+        }
+    ]
 }
 ```
 
@@ -360,55 +376,66 @@ Gelecek datanın en kapsamlı modeli ise aşağıdaki gibidir
 
 ```typescript
 {
-  "kind": string,
-  "startTimeMillis": string,
-  "expiryTimeMillis": string,
-  "autoResumeTimeMillis": string,
-  "autoRenewing": boolean,
-  "priceCurrencyCode": string,
-  "priceAmountMicros": string,
-  "introductoryPriceInfo": {
-    "introductoryPriceCurrencyCode": string,
-    "introductoryPriceAmountMicros": string,
-    "introductoryPricePeriod": string,
-    "introductoryPriceCycles": number
-  },
-  "countryCode": string,
-  "developerPayload": string,
-  "paymentState": number,
-  "cancelReason": number,
-  "userCancellationTimeMillis": string,
-  "cancelSurveyResult": {
-    "cancelSurveyReason": number,
-    "userInputCancelReason": string
-  },
-  "orderId": string,
-  "linkedPurchaseToken": string,
-  "purchaseType": number,
-  "priceChange": {
-    "newPrice": {
-        "priceMicros": string,
-        "currency": string
-    },
-    "state": number
-  },
-  "profileName": string,
-  "emailAddress": string,
-  "givenName": string,
-  "familyName": string,
-  "profileId": string,
-  "acknowledgementState": number,
-  "externalAccountId": string,
-  "promotionType": number,
-  "promotionCode": string,
-  "obfuscatedExternalAccountId": string,
-  "obfuscatedExternalProfileId": string
+  kind: string;
+
+  // Ana abonelik bilgileri
+  latestOrderId?: string;
+  regionCode?: string;
+  subscriptionState?: 
+    | "SUBSCRIPTION_STATE_UNSPECIFIED"
+    | "SUBSCRIPTION_STATE_PENDING"
+    | "SUBSCRIPTION_STATE_ACTIVE"
+    | "SUBSCRIPTION_STATE_PAUSED"
+    | "SUBSCRIPTION_STATE_IN_GRACE_PERIOD"
+    | "SUBSCRIPTION_STATE_ON_HOLD"
+    | "SUBSCRIPTION_STATE_CANCELED"
+    | "SUBSCRIPTION_STATE_EXPIRED";
+
+  acknowledgementState?: 
+    | "ACKNOWLEDGEMENT_STATE_UNSPECIFIED"
+    | "ACKNOWLEDGEMENT_STATE_PENDING"
+    | "ACKNOWLEDGEMENT_STATE_ACKNOWLEDGED";
+
+  externalAccountIdentifiers_obfuscatedExternalAccountId?: string;
+  externalAccountIdentifiers_obfuscatedExternalProfileId?: string;
+
+  startTime?: string;
+  linkedPurchaseToken?: string;
+  pausedState_initiationTime?: string;
+  pausedState_resumeTime?: string;
+  cancelledState_userInitiatedCancellationTime?: string;
+  cancelledState_cancelSurveyReason?: number;
+  cancelledState_cancelSurveyReasonUserInput?: string;
+  cancelledState_autoResumeTime?: string;
+
+  // lineItems[0] içeriği
+  lineItem_productId?: string;
+  lineItem_offerId?: string;
+  lineItem_basePlanId?: string;
+  lineItem_offerTags?: string[];
+  lineItem_expiryTime?: string;
+  lineItem_autoRenewing?: boolean;
+
+  // price info
+  lineItem_price_currencyCode?: string;
+  lineItem_price_units?: string;
+  lineItem_price_nanos?: number;
+
+  // test purchase
+  testPurchase?: object;
+
+  // promotion
+  lineItem_prepaidPlan_allowExtend?: boolean;
+  lineItem_prepaidPlan_pauseTime?: string;
+
+  // developerPayload yerine kullanılabilecek alan (yoksa kendin eklemelisin)
+  // customData?: string;
 }
 ```
 
 İlgili alanların açıklamaları linkte verilmiştir
 
-[Resource: SubscriptionPurchase](https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.subscriptions#resource:-subscriptionpurchase)
+[Resource: SubscriptionPurchase](https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.subscriptionsv2#SubscriptionPurchaseV2)
 
 ## Google server notifications
 
